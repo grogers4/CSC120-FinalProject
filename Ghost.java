@@ -2,27 +2,23 @@ import java.util.Hashtable;
 
 public class Ghost {
 
-    /**hashtable to store items in the house and their description */
-    public Hashtable<String, String> objectDescription;
-    /**hashtable to store  */
-    public Hashtable<String, Boolean> smallObjects;
-
     private int ghostPowers;
-
     private Boolean isPossessing;
-
     private int size;
+    public Room location;
 
-    public String coordinates;
 
     /**
      * constructor for a ghost
      */
     public Ghost() {
-        System.out.println("You have died and are now a ghost haunting a small house.");
         ghostPowers = 5;
         isPossessing = false;
         size = 2;
+    }
+
+    public Room getLocation() {
+        return this.location;
     }
 
     /**
@@ -30,7 +26,7 @@ public class Ghost {
      * prints statement that the item can't be grabbed cause you're a ghost
      * @param Items 
      */
-    public void grab(Items word) {
+    public void grab(Item word) {
         System.out.println("Your ghost hand passes through the " + word + ". Ghosts cannot grab things.");
     }
 
@@ -63,7 +59,12 @@ public class Ghost {
      * @param string item
      */
     public void examine(String item) {
-        System.out.println(objectDescription.get(item));
+        if (this.location == Item.getLocation(item)) {
+            System.out.println(Item.getDescription(item));
+        } else {
+            throw new RuntimeException("This item cannot be found in this room.");
+        }
+        
     }
 
     /**
@@ -71,9 +72,9 @@ public class Ghost {
      * sets isPossessing boolean to true
      * @param string item
      */
-    public void use(String item) {
+    public void possess(Item name) {
         if (ghostPowers>0) {
-            System.out.println("You are now possessing the " + item + ". Scary. Everyone who interacts with this item will be very very scared.");
+            System.out.println("You are now possessing the " + name + ". Scary. Everyone who interacts with this item will be very very scared.");
             isPossessing = true;
             ghostPowers = 0;
         } else { 
@@ -81,42 +82,19 @@ public class Ghost {
         }
     }
 
-    /**
-     * method to walk (ghosts cannot walk, so always returns false) 
-     * @param string direction
-     * @returns boolean false 
-     */
-    public boolean walk(String direction) {
-        System.out.println("Ghosts can't walk. Try flying if you want to move around.");
-        return false;
-    }
 
     /**
-     * method to fly, sets coordinates if they are within acceptable range
-     * @param int x
-     * @param int y
-     * @return Boolean based on success of flying
+     * method to 
+     * @param 
      */
-    public boolean fly(int x, int y) {
+    public void enter(Room name) {
         if (isPossessing == false) {
-            if (x < 31) {
-                if (y < 31) {
-                    String str_x = Integer.toString(x);
-                    String str_y = Integer.toString(y);
-                    coordinates = "(" + str_x + ", " + str_y + ")";
-                    System.out.println("New coordinates: " + coordinates);
-                    return true;
-                } else {
-                    throw new RuntimeException("Your soul is permanently bound to the location you died: a one room house under 1,000 sqaure feet. Please enter coordinate values no greater than 30 when flying.");
-                }
-            } else { 
-                throw new RuntimeException("Your soul is permanently bound to the location you died: a one room house under 1,000 sqaure feet. Please enter coordinate values no greater than 30 when flying.");
+            if (name.enter(this)) {
+                location = name;
             }
         } else { 
-            System.out.println("You cannot fly while possessing something.");
-            return false;
+            System.out.println("You cannot move while possessing something.");
         }
-
     }
 
     /**
@@ -128,6 +106,7 @@ public class Ghost {
             if (size > 1) {
                 size --;
                 ghostPowers--;
+                System.out.println("You have shrunk");
             } else { 
                 System.out.println("You are too little to shrink");
             }
@@ -146,6 +125,7 @@ public class Ghost {
             if (size < 3) {
                 size ++;
                 ghostPowers --;
+                System.out.println("You have grown");
             } else { 
                 System.out.println("You are too big to grow");
             }
@@ -172,6 +152,7 @@ public class Ghost {
      * method to undo possession
      */
     public void undo() {
+        isPossessing = false;
     }
 
     public static void main(String[] args) {

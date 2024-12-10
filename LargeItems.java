@@ -1,3 +1,3 @@
-public class LargeItems extends Items{
+public class LargeItems extends Item{
     
 }
